@@ -9,8 +9,9 @@ const int upPosition = 180;
 const int waveUp = 120;
 const int waveDown = 20;
 const int downPosition = 0;
+const int waitPosition = 90;
 
-int currentPosition = waveDown;
+int currentPosition = waitPosition;
 
 enum class State {
   Waiting,
@@ -20,7 +21,7 @@ enum class State {
 
 State currentState = State::Waiting;
 int64_t lastDrinkTimeSeconds = 0;
-int64_t drinkIntervalSeconds = 20;
+int64_t drinkIntervalSeconds = 90 * 60;
 int64_t maxWaveSeconds = 30;
 
 static int64_t getSecondsSinceStart() { return esp_timer_get_time() / 1000000; }
@@ -37,6 +38,8 @@ void setup() {
   myServo.setPeriodHertz(50);
   myServo.attach(servoPin, 1000, 2000);
 
+  myServo.write(waveUp);
+  delay(300);
   myServo.write(currentPosition);
 
   lastDrinkTimeSeconds = getSecondsSinceStart();
@@ -87,7 +90,7 @@ void loop() {
   }
   case State::Waiting: {
     Serial.println("Waiting");
-    moveToPosition(waveDown, 10);
+    moveToPosition(waitPosition, 10);
     delay(1000);
     lastDrinkTimeSeconds = getSecondsSinceStart();
     while (true) {
